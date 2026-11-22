@@ -91,6 +91,10 @@ void Interpreter::run() {
       }
 
       switch (parse::determine_construct(line)) {
+        case Construct::Assignment: {
+          // TODO: Implement rhs and lhs parsing and assignment
+          break;
+        }
         case Construct::FuncDecl: {
           std::vector func_def_lines {line};
           std::size_t base_indent_lvl {indent_lvl};

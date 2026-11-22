@@ -4,10 +4,11 @@
 #include <string_view>
 
 namespace worm::parse::keywords {
-constexpr std::string_view func_decl {"func"};
-constexpr std::string_view condition {"if"};
+inline constexpr std::string_view func_decl {"func"};
+inline constexpr std::string_view condition {"if"};
 /* It must hold that `is_identifier_char(vararg[0]) == true` */
-constexpr std::string_view vararg {"vararg"};
+inline constexpr std::string_view vararg {"vararg"};
+inline constexpr std::string_view assignment {"="};
 } // namespace worm::parse::keywords
 
 #endif // WORM_PARSE_KEYWORDS_H

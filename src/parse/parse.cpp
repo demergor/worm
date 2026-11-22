@@ -70,6 +70,8 @@ std::size_t param_len(std::string_view sv, bool variadic) {
   }
 }
 
+// NOTE: The logic in this will need to be updated once one line can contain more than
+// one construct
 Construct determine_construct(std::string_view line) {
   if (line.empty()) {
     return Construct::Statement;
@@ -77,7 +79,8 @@ Construct determine_construct(std::string_view line) {
 
   static const std::pair<const std::string_view, const Construct> map[] {
     {keywords::condition, Construct::Condition},
-    {keywords::func_decl, Construct::FuncDecl}
+    {keywords::func_decl, Construct::FuncDecl},
+    {keywords::assignment, Construct::Assignment},
   };
 
   for (const auto& [keyword, construct] : map) {

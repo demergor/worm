@@ -7,6 +7,7 @@ enum class Construct {
   FuncDecl,
   Loop,
   Statement,
+  ShellCmd,
 };
 
 #endif // WORM_PARSE_CONSTRUCT_H

@@ -1,5 +1,4 @@
 #include <cassert>
-#include <iostream>
 #include <string>
 
 #include "worm/util/string.h"
