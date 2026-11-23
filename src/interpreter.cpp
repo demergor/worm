@@ -92,7 +92,14 @@ void Interpreter::run() {
 
       switch (parse::determine_construct(line)) {
         case Construct::Assignment: {
-          // TODO: Implement rhs and lhs parsing and assignment
+          auto [lhs, rhs] = parse::parse_assignment(line);
+          switch (parse::determine_construct(rhs)) {
+            case Construct::Statement: vars[lhs] = rhs; break;
+            default:
+              throw errors::InterpreterError {errors::ErrInfo {
+                .msg {"Not yet implemented!"},
+              }};
+          }
           break;
         }
         case Construct::FuncDecl: {

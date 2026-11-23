@@ -5,6 +5,7 @@ enum class Construct {
   Assignment,
   Condition,
   FuncDecl,
+  FuncCall,
   Loop,
   Statement,
   ShellCmd,
