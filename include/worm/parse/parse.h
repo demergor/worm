@@ -99,5 +99,16 @@ namespace worm::parse {
  * vararg[5], next_param -> `vararg_len()` would be {9, 5}
  */
 [[nodiscard]] std::pair<std::size_t, std::size_t> vararg_len(std::string_view);
+/*
+ * Splits the left-hand-side and right-hand-side of an assignment into two parts
+ *
+ * @return: Returns the left hand side and right hand side as pair
+ *
+ * @throw: Throws `worm::parse::ParseError` if the assignment cannot be uniquely
+ * determined
+ */
+[[nodiscard]] std::pair<std::string, std::string> parse_assignment(
+  const std::string&
+);
 } // namespace worm::parse
 #endif // WORM_PARSE_PARSE_H

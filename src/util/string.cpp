@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include <cstddef>
+#include <iostream>
 #include <string>
 #include <string_view>
 
@@ -65,7 +66,15 @@ std::string_view strip_circumfix(const std::string& s, char target) {
   return {s.begin() + 1, s.end() - 1};
 }
 
-bool contains_keyword(std::string_view needle, std::string_view haystack) {
+bool contains_keyword(
+  std::string_view needle,
+  std::string_view haystack,
+  bool wrapping_spaces
+) {
+  if (!wrapping_spaces) {
+    return find_not_quoted(needle, haystack) != std::string::npos;
+  }
+
   if (haystack.size() < needle.size()) {
     return false;
   }
@@ -106,6 +115,45 @@ bool contains_keyword(std::string_view needle, std::string_view haystack) {
   }
 
   return needle == std::string_view {haystack.begin() + idx, haystack.end()};
+}
+
+std::size_t find_not_quoted(std::string_view needle, std::string_view haystack) {
+  if (haystack.empty() || needle.size() > haystack.size()) {
+    return std::string::npos;
+  }
+
+  if (needle.empty()) {
+    return 0;
+  }
+
+  bool in_quotes {false};
+  for (std::size_t i {0}; i < haystack.size(); ++i) {
+    if (haystack[i] == parse::types::str_delim) {
+      in_quotes = !in_quotes;
+      continue;
+    }
+
+    if (in_quotes || haystack[i] != needle[0]) {
+      continue;
+    }
+
+    bool early_break {false};
+    std::size_t j {1};
+
+    while (!early_break && j < needle.size()) {
+      if (haystack[i + j] != needle[j]) {
+        early_break = true;
+      }
+
+      ++j;
+    }
+
+    if (!early_break) {
+      return i;
+    }
+  }
+
+  return std::string::npos;
 }
 
 std::size_t indent_lvl(const std::string& s) {

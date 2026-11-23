@@ -4,8 +4,11 @@
 #include <cctype>
 #include <charconv>
 #include <cstddef>
+#include <format>
+#include <string>
 #include <string_view>
 #include <system_error>
+#include <utility>
 #include <vector>
 
 #include "worm/errors/err_info.h"
@@ -73,18 +76,24 @@ std::size_t param_len(std::string_view sv, bool variadic) {
 // NOTE: The logic in this will need to be updated once one line can contain more than
 // one construct
 Construct determine_construct(std::string_view line) {
+  struct Triplet {
+    const std::string_view keyword;
+    const Construct construct;
+    const bool wrapping_spaces;
+  };
+
   if (line.empty()) {
     return Construct::Statement;
   }
 
-  static const std::pair<const std::string_view, const Construct> map[] {
-    {keywords::condition, Construct::Condition},
-    {keywords::func_decl, Construct::FuncDecl},
-    {keywords::assignment, Construct::Assignment},
+  static const Triplet map[] {
+    {keywords::condition, Construct::Condition, true},
+    {keywords::func_decl, Construct::FuncDecl, true},
+    {keywords::assignment, Construct::Assignment, false},
   };
 
-  for (const auto& [keyword, construct] : map) {
-    if (util::string::contains_keyword(keyword, line)) {
+  for (const auto& [keyword, construct, wrapping_spaces] : map) {
+    if (util::string::contains_keyword(keyword, line, wrapping_spaces)) {
       return construct;
     }
   }
@@ -210,5 +219,33 @@ std::pair<std::size_t, std::size_t> vararg_len(std::string_view sv) {
   }
 
   return {len, parsed_idx};
+}
+
+std::pair<std::string, std::string> parse_assignment(const std::string& s) {
+  auto pos {util::string::find_not_quoted(keywords::assignment, s)};
+  if (pos == std::string::npos) {
+    throw ParseError {errors::ErrInfo {
+      .msg = {std::format(
+        "Operating on input: \"{}\"\n"
+        "Error parsing assignment: not an assignment!",
+        s
+      )},
+    }};
+  }
+
+  auto dt_pos {static_cast<std::string::difference_type>(pos)};
+  std::string lhs {std::string {s.begin(), s.begin() + dt_pos}};
+  std::string rhs {std::string {s.begin() + dt_pos + 1, s.end()}};
+
+  if (rhs.find(keywords::assignment) != std::string::npos) {
+    throw ParseError {errors::ErrInfo {
+      .msg = {"Error parsing assignment: multi-assignments not allowed!"},
+    }};
+  }
+
+  util::string::trim(lhs);
+  util::string::trim(rhs);
+
+  return {lhs, rhs};
 }
 } // namespace worm::parse

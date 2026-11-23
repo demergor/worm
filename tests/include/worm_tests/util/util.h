@@ -1,12 +1,24 @@
 #ifndef WORM_TESTS_UTIL_UTIL_H
 #define WORM_TESTS_UTIL_UTIL_H
 
+#include <cassert>
 #include <cstdlib>
 #include <format>
 #include <iostream>
+#include <ostream>
 #include <vector>
 
 namespace worm_tests::util {
+template <typename T>
+void assert_eq(
+  const T& actual,
+  const T& expected,
+  std::ostream& out = std::cerr
+) {
+  auto msg {std::format("\x1b[31mactual: {}, expected: {}\x1b[0m\n", actual, expected)};
+  assert(actual == expected || (out << msg, out.flush(), false));
+}
+
 template <typename T>
 void cmp_vecs(std::vector<T> actual, std::vector<T> expected) {
   if (actual.size() != expected.size()) {

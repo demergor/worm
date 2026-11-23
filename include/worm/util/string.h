@@ -28,10 +28,11 @@ void trim(std::string&, bool (*should_strip)(char) = isspace);
 [[nodiscard]] std::string_view trimmed_view(std::string_view);
 /*
  * Provides a view without one layer of wrapping @param target
- * If the provided string is not wrapped at the front AND back with @param target, 
- * this function returns a view of the unchanged input string 
+ * If the provided string is not wrapped at the front AND back with @param target,
+ * this function returns a view of the unchanged input string
  */
 [[nodiscard]] std::string_view strip_circumfix(const std::string&, char target);
+
 /*
  * Parses a comma-separated list according to @param token_length and
  * @param is_token_char
@@ -87,12 +88,31 @@ template <LengthGetter L>
 
   return params;
 }
+
 /*
  * Checks the "haystack" for the "needle".
  * Note that the needle is not allowed to be inside string delimiters
- * and that it must be surrounded by whitespaces to reduce ambiguity
+ * and, if @param `wrapping_spaces` is set, it must be surrounded by whitespaces to
+ * reduce ambiguity
  */
-[[nodiscard]] bool contains_keyword(std::string_view needle, std::string_view haystack);
+[[nodiscard]] bool contains_keyword(
+  std::string_view needle,
+  std::string_view haystack,
+  bool wrapping_spaces = true
+);
+/*
+ * Finds @param `needle` in @param `haystack`
+ *
+ * @return: Returns the index of the first match that isn't wrapped inside quotes
+ * (= that is not inside a string)
+ * or `std::string::npos` if not found
+ *
+ * Example: find_not_quoted("Hello, \"Lulu\" world!Lulu", "Lulu") -> 22, not 10
+ */
+[[nodiscard]] std::size_t find_not_quoted(
+  std::string_view needle,
+  std::string_view haystack
+);
 /*
  * Determines the level of indentation of given line
  */

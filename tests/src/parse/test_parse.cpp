@@ -1,6 +1,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "worm/errors/interpreter_error.h"
@@ -128,6 +129,13 @@ void test_missing_left_bracket() {
 }
 } // namespace vararg_len_tests
 
+namespace parse_assignment_tests {
+void test_normal_input() {
+  std::pair<std::string, std::string> expected {"x", "\"tschinkifu\""};
+  worm_tests::util::assert_eq(parse_assignment("x = \"tschinkifu\""), expected);
+}
+} // namespace parse_assignment_tests
+
 void test_parse() {
   parse_identifiers_tests::test_empty_input();
   parse_identifiers_tests::test_non_ascii_input();
@@ -143,5 +151,7 @@ void test_parse() {
   vararg_len_tests::test_float_idx_fails();
   vararg_len_tests::test_missing_left_bracket();
   vararg_len_tests::test_missing_right_bracket();
+
+  parse_assignment_tests::test_normal_input();
 }
 } // namespace worm::parse
