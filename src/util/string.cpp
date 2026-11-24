@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "worm/parse/types.h"
 
@@ -153,6 +154,79 @@ std::size_t find_not_quoted(std::string_view needle, std::string_view haystack) 
   }
 
   return std::string::npos;
+}
+
+std::string_view find_balanced_region(
+  std::string_view haystack,
+  std::string_view left_delim,
+  std::string_view right_delim
+) {
+  if (left_delim == right_delim) {
+    return find_balanced_region(haystack, left_delim);
+  }
+
+  static std::vector<char> stack;
+  stack.clear();
+
+  std::size_t start_pos {find_not_quoted(left_delim, haystack)};
+  if (start_pos != std::string::npos) {
+    stack.emplace_back('r');
+  }
+
+  std::size_t idx {start_pos};
+  while (idx < haystack.size() && !stack.empty()) {
+    std::size_t ldel_pos {
+      find_not_quoted(left_delim, {haystack.begin() + idx, haystack.end()})
+    };
+    std::size_t rdel_pos {
+      find_not_quoted(right_delim, {haystack.begin() + idx, haystack.end()})
+    };
+
+    char cur_to_match {stack.back()};
+    if (ldel_pos < rdel_pos) {
+      if (cur_to_match == 'r') {
+        stack.pop_back();
+      } else {
+        stack.push_back('l');
+      }
+      idx = ldel_pos;
+    } else if (rdel_pos < ldel_pos) {
+      if (cur_to_match == 'l') {
+        stack.pop_back();
+      } else {
+        stack.push_back('r');
+      }
+      idx = rdel_pos;
+    } else {
+      break;
+    }
+  }
+
+  if (!haystack.empty()) {
+    return "";
+  } else {
+    return {haystack.begin() + start_pos + left_delim.size(), haystack.begin() + idx};
+  }
+}
+
+std::string_view find_balanced_region(
+  std::string_view haystack,
+  std::string_view delim
+) {
+  std::size_t start_idx {haystack.find(delim)};
+  if (start_idx == std::string::npos) {
+    return "";
+  }
+
+  std::size_t end_idx {
+    std::string_view {haystack.begin() + start_idx, haystack.end()}.find(delim)
+  };
+
+  if (end_idx == std::string::npos) {
+    return "";
+  }
+
+  return {haystack.begin() + start_idx + 1, haystack.begin() + end_idx};
 }
 
 std::size_t indent_lvl(const std::string& s) {

@@ -114,6 +114,26 @@ template <LengthGetter L>
   std::string_view haystack
 );
 /*
+ * @return: Returns the first string that is between @param `left_delim` and the
+ * matching @param `right_delim`, behaves like a (STRING-AWARE!!!) parantheses matcher,
+ * does not do greedy outer matching
+ *
+ * @throw: Throws if no unambiguous balanced region exists between @param `left_delim`
+ * and @param `right_delim`
+ *
+ * Example:
+ * `balanced_region("Hello, world(this, that), "(", ")")`
+ */
+[[nodiscard]] std::string_view find_balanced_region(
+  std::string_view haystack,
+  std::string_view left_delim,
+  std::string_view right_delim
+);
+[[nodiscard]] std::string_view find_balanced_region(
+  std::string_view haystack,
+  std::string_view delim
+);
+/*
  * Determines the level of indentation of given line
  */
 [[nodiscard]] std::size_t indent_lvl(const std::string&);

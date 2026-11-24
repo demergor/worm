@@ -10,16 +10,6 @@
 
 namespace worm::parse {
 /*
- * Reads the given line and determines the exact construct of the line
- *
- * Edge cases:
- * Should ignore empty lines
- *
- * @return: Returns an enum type that specifies the type of construct; it's value is
- * intended to be used at the callsite to choose how the parser should proceed
- */
-[[nodiscard]] Construct determine_construct(std::string_view);
-/*
  * @return: Returns `true` if given char can legally appear in
  * a .worm function signature, otherwise returns `false`
  */

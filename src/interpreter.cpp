@@ -90,11 +90,11 @@ void Interpreter::run() {
         continue;
       }
 
-      switch (parse::determine_construct(line)) {
-        case Construct::Assignment: {
+      switch (parse::construct::determine_construct(line)) {
+        case parse::construct::Construct::Assignment: {
           auto [lhs, rhs] = parse::parse_assignment(line);
-          switch (parse::determine_construct(rhs)) {
-            case Construct::Statement: vars[lhs] = rhs; break;
+          switch (parse::construct::determine_construct(rhs)) {
+            case parse::construct::Construct::Statement: vars[lhs] = rhs; break;
             default:
               throw errors::InterpreterError {errors::ErrInfo {
                 .msg {"Not yet implemented!"},
@@ -102,7 +102,7 @@ void Interpreter::run() {
           }
           break;
         }
-        case Construct::FuncDecl: {
+        case parse::construct::Construct::FuncDecl: {
           std::vector func_def_lines {line};
           std::size_t base_indent_lvl {indent_lvl};
 
@@ -121,7 +121,7 @@ void Interpreter::run() {
           functions::def_func(func_def_lines);
           break;
         }
-        case Construct::Statement: {
+        case parse::construct::Construct::Statement: {
           functions::substitute_execute(line, vars);
           break;
         }
